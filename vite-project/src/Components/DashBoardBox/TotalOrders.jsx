@@ -1,13 +1,14 @@
 import * as React from "react";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import Vector from "../../assets/Vector.png";
+import Title from "../DashBoard/Title";
+import Vector3 from "../../assets/Vector3.png";
 import Box from "@mui/material/Box";
 function preventDefault(event) {
   event.preventDefault();
 }
 
-export default function Deposits({ dashBoardData }) {
+export default function TotalOrders({ dashBoardData }) {
   return (
     <React.Fragment>
       {/* <Title>Recent Deposits</Title> */}
@@ -24,7 +25,7 @@ export default function Deposits({ dashBoardData }) {
               marginTop: "2rem",
             }}
             alt="The house from the offer."
-            src={Vector}
+            src={Vector3}
           />
           <Typography
             sx={{
@@ -35,12 +36,12 @@ export default function Deposits({ dashBoardData }) {
             component="p"
             variant="h4"
           >
-            {dashBoardData?.total_dues}
+            {dashBoardData?.total_orders}
           </Typography>
           <Typography color="text.secondary" sx={{ textAlign: "center" }}>
-            Total Dues
+            Total Orders
           </Typography>
-          <div style={{ marginTop: "2rem", marginLeft: "2.5rem" }}>
+          <div style={{ marginTop: "3rem", marginLeft: "2.5rem" }}>
             <Link color="primary" href="#" onClick={preventDefault}>
               View Detailed Report
             </Link>

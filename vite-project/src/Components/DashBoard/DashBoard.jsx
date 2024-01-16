@@ -19,8 +19,17 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { mainListItems, secondaryListItems } from "./ListItem";
 import Deposits from "./Deposits";
-import Orders from "./Orders";
 import { useState, useEffect } from "react";
+import TotalOrders from "../DashBoardBox/TotalOrders";
+import TotalAccepted from "../DashBoardBox/TotalAccepted";
+import TotalAcceptedOrders from "../DashBoardBox/TotalAcceptedOrders";
+import OpenTicket from "../DashBoardBox/OpenTicket";
+import TotalOrdersList from "../DashBoardList/TotalOrders";
+import AppUsers from "../DashBoardList/AppUsers";
+import TotalDuesList from "../DashBoardList/TotalDues";
+import Shipping from "../DashBoardList/Shipment";
+import FilterData from "../FilterData/FilterData";
+
 function Copyright(props) {
   return (
     <Typography
@@ -88,37 +97,47 @@ const Drawer = styled(MuiDrawer, {
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
+  const [dashBoardData, setDashBoardData] = useState("");
+  console.log("dashBoardDataaa", dashBoardData);
   const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+
   const storedUserData = localStorage.getItem("user");
   const user = JSON.parse(storedUserData);
 
-  const fetchUserDashBoardData = async () => {
-    // setLoading(true);
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
+  const fetchUserDashBoardData = React.useCallback(async (selectedDate) => {
+    setLoading(true);
     try {
       const response = await fetch(
-        "https://rsfpsoftware.gowild.co.in/dashboard/dashboard-statics",
+        `https://rsfpsoftware.gowild.co.in/dashboard/dashboard-statics?days=${selectedDate}`,
         {
           headers: {
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Token ${user.token}`,
           },
         }
       );
       if (response.ok) {
-        // setLoading(false);
+        setLoading(false);
         const data = await response.json();
-        console.log("DashboardData", data);
+
+        setDashBoardData(data);
       } else {
         console.error("Failed to fetch dashboard data");
       }
     } catch (error) {
       console.log(error);
     }
-  };
-  useEffect(() => {
-    if (user) {
-      fetchUserDashBoardData();
-    }
   }, []);
+  useEffect(() => {
+    console.log("useEffect Called");
+    if (user) {
+      fetchUserDashBoardData(selectedDate);
+    }
+  }, [selectedDate, fetchUserDashBoardData]);
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -126,7 +145,6 @@ export default function Dashboard() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      {/* {loading ? <h1>Loading...</h1> : ""} */}
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
@@ -197,19 +215,11 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 240,
-                  }}
-                ></Paper>
-              </Grid>
-
+            <div>
+              <FilterData handleDateChange={handleDateChange} />
+            </div>
+            {loading ? <Typography variant="h6">Loading...</Typography> : ""}
+            <Grid container spacing={4}>
               <Grid item xs={12} md={4} lg={3}>
                 <Paper
                   sx={{
@@ -219,14 +229,71 @@ export default function Dashboard() {
                     height: 240,
                   }}
                 >
-                  <Deposits />
+                  <Deposits dashBoardData={dashBoardData} />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 240,
+                  }}
+                >
+                  <TotalOrders dashBoardData={dashBoardData} />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 240,
+                  }}
+                >
+                  <TotalAccepted dashBoardData={dashBoardData} />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 240,
+                  }}
+                >
+                  <TotalAcceptedOrders dashBoardData={dashBoardData} />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 240,
+                  }}
+                >
+                  <OpenTicket dashBoardData={dashBoardData} />
                 </Paper>
               </Grid>
 
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                  <Orders />
-                </Paper>
+              <Grid container spacing={2} mt={4}>
+                <Grid item xs={6}>
+                  <AppUsers dashBoardData={dashBoardData} />
+                </Grid>
+                <Grid item xs={6}>
+                  <TotalOrdersList dashBoardData={dashBoardData} />
+                </Grid>
+                <Grid item xs={6}>
+                  <TotalDuesList dashBoardData={dashBoardData} />
+                </Grid>
+                <Grid item xs={6}>
+                  <Shipping dashBoardData={dashBoardData} />
+                </Grid>
               </Grid>
             </Grid>
             <Copyright sx={{ pt: 4 }} />

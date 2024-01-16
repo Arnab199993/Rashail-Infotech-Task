@@ -43,8 +43,9 @@ export default function SignIn() {
     password: "",
   };
   const [loginData, setLoginData] = useState(defaultState);
-  // const [storedData, setStoredData] = useState("");
-  // console.log("storedDataaaa", JSON.stringify(storedData));
+  const [login, setLogin] = useState(false);
+  const [handleError, setError] = useState("");
+
   const handleChange = (event) => {
     setLoginData({ ...loginData, [event.target.name]: event.target.value });
   };
@@ -61,6 +62,8 @@ export default function SignIn() {
   const handleLogin = async () => {
     if (loginData.username !== "" && loginData.password !== "") {
       try {
+        setLogin(true);
+        setError("");
         const fetchLoginData = await fetch(
           "https://rsfpsoftware.gowild.co.in/dashboard/login/",
           {
@@ -74,16 +77,21 @@ export default function SignIn() {
             },
           }
         );
+
         const result = await fetchLoginData.json();
         if (result.token) {
-          // console.log("ress", result);
           localStorage.setItem("user", JSON.stringify(result));
           if (localStorage.getItem("user")) {
             navigate("/dashboard");
+          } else {
+            setError("Invalid credentials");
           }
         }
       } catch (error) {
         console.log(error);
+        setError("An error occurred while logging in");
+      } finally {
+        setLogin(false);
       }
     }
   };
@@ -165,8 +173,18 @@ export default function SignIn() {
                 sx={{ mt: 3, mb: 2 }}
                 onClick={handleLogin}
               >
-                Log In
+                {login ? "Logging In..." : "Log In"}
               </Button>
+              {handleError && (
+                <Typography
+                  variant="body2"
+                  color="error"
+                  align="center"
+                  sx={{ mt: 2 }}
+                >
+                  {handleError}
+                </Typography>
+              )}
 
               <Copyright sx={{ mt: 5 }} />
             </Box>
